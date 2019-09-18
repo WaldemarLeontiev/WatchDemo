@@ -19,7 +19,11 @@
                                 <action selector="endWorkoutSessionButtonPressed" destination="AgC-eL-Hgc" id="cVs-n0-CWh"/>
                             </connections>
                         </button>
+                        <spriteKitScene width="100" height="100" alignment="center" id="jmQ-Oj-rC5"/>
                     </items>
+                    <connections>
+                        <outlet property="sceneInteface" destination="jmQ-Oj-rC5" id="qvO-cP-g4Z"/>
+                    </connections>
                 </controller>
             </objects>
         </scene>
