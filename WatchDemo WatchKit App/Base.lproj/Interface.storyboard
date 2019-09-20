@@ -22,6 +22,7 @@
                         <spriteKitScene width="100" height="100" alignment="center" id="jmQ-Oj-rC5"/>
                     </items>
                     <connections>
+                        <outlet property="endSessionButton" destination="XA2-HX-6AQ" id="LrR-dd-0f9"/>
                         <outlet property="sceneInteface" destination="jmQ-Oj-rC5" id="qvO-cP-g4Z"/>
                     </connections>
                 </controller>

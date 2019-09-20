@@ -15,6 +15,7 @@ class InterfaceController: WKInterfaceController {
     
     // MARK: - UI objects
     @IBOutlet weak var sceneInteface: WKInterfaceSKScene!
+    @IBOutlet weak var endSessionButton: WKInterfaceButton!
     private let scene = WatchFaceScene(size: CGSize(width: InterfaceController.sceneSize,
                                                     height: InterfaceController.sceneSize))
     
@@ -29,10 +30,39 @@ class InterfaceController: WKInterfaceController {
         self.setupHands()
         self.setupScene()
     }
+    override func willActivate() {
+        super.willActivate()
+        self.isActivated = true
+    }
+    override func didDeactivate() {
+        super.didDeactivate()
+        self.isActivated = false
+    }
     
     // MARK: - Private
+    // MARK: Settings
     static private let sceneSize: CGFloat = 100
+    private let isHideInterfaceEnabled = true
+    // MARK: Vars
     private var presentedTimestamp: Int?
+    private var isActivated: Bool = false {
+        didSet {
+            if self.isActivated == false {
+                self.isInterfaceHidden = true
+            }
+        }
+    }
+    private var isInterfaceHidden = false {
+        didSet {
+            if isHideInterfaceEnabled {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                    if let isInterfaceHidden = self?.isInterfaceHidden {
+                        self?.setInterface(hidden: isInterfaceHidden)
+                    }
+                }
+            }
+        }
+    }
 }
 
 // MARK: - UI actions
@@ -63,6 +93,9 @@ extension InterfaceController {
         if timestamp != self.presentedTimestamp {
             self.presentedTimestamp = timestamp
             self.updateTime(with: date)
+            if self.isActivated && self.isInterfaceHidden {
+                self.isInterfaceHidden = false
+            }
         }
     }
     private func updateTime(with date: Date) {
@@ -77,6 +110,10 @@ extension InterfaceController {
     }
     private func set(progress: Double, of node: SKNode) {
         node.zRotation = -2 * CGFloat.pi * CGFloat(progress)
+    }
+    private func setInterface(hidden: Bool) {
+        self.sceneInteface.setHidden(hidden)
+        self.endSessionButton.setHidden(hidden)
     }
 }
 
