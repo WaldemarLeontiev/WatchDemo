@@ -15,7 +15,7 @@ class InterfaceController: WKInterfaceController {
     
     // MARK: - UI objects
     @IBOutlet weak var sceneInteface: WKInterfaceSKScene!
-    private let scene = SKScene(size: CGSize(width: 300, height: 300))
+    private let scene = WatchFaceScene(size: CGSize(width: 300, height: 300))
     
     // MARK: - Nodes
     private lazy var hourHandNode = self.make(handNode: .hour)
@@ -25,10 +25,12 @@ class InterfaceController: WKInterfaceController {
     // MARK: - WKInterfaceController overrides
     override func awake(withContext context: Any?) {
         super.awake(withContext: context)
-        self.setupScene()
         self.setupHands()
+        self.setupScene()
     }
-
+    
+    // MARK: - Private
+    private var presentedTimestamp: Int?
 }
 
 // MARK: - UI actions
@@ -43,11 +45,35 @@ extension InterfaceController {
     private func setupScene() {
         self.sceneInteface.presentScene(self.scene)
         self.scene.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        self.scene.updateHandler = { [weak self] in
+            self?.updateTimeIfNeeded()
+        }
     }
     private func setupHands() {
         self.scene.addChild(self.hourHandNode)
         self.scene.addChild(self.minuteHandNode)
         self.scene.addChild(self.secondHandNode)
+    }
+    private func updateTimeIfNeeded() {
+        let date = Date()
+        let timestamp = Int(date.timeIntervalSince1970)
+        if timestamp != self.presentedTimestamp {
+            self.presentedTimestamp = timestamp
+            self.updateTime(with: date)
+        }
+    }
+    private func updateTime(with date: Date) {
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        let secondsOfDay = date.timeIntervalSince(startOfDay)
+        let hoursProgress = secondsOfDay / (3600 * 24)
+        let minutesProgress = secondsOfDay / 3600 - (hoursProgress * 24).rounded(.down)
+        let secondsProgress = secondsOfDay / 60 - (hoursProgress * 24).rounded(.down) * 60 - (minutesProgress * 60).rounded(.down)
+        self.set(progress: hoursProgress * 2, of: self.hourHandNode)
+        self.set(progress: minutesProgress, of: self.minuteHandNode)
+        self.set(progress: secondsProgress, of: self.secondHandNode)
+    }
+    private func set(progress: Double, of node: SKNode) {
+        node.zRotation = -2 * CGFloat.pi * CGFloat(progress)
     }
 }
 
