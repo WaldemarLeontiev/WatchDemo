@@ -15,7 +15,8 @@ class InterfaceController: WKInterfaceController {
     
     // MARK: - UI objects
     @IBOutlet weak var sceneInteface: WKInterfaceSKScene!
-    private let scene = WatchFaceScene(size: CGSize(width: 300, height: 300))
+    private let scene = WatchFaceScene(size: CGSize(width: InterfaceController.sceneSize,
+                                                    height: InterfaceController.sceneSize))
     
     // MARK: - Nodes
     private lazy var hourHandNode = self.make(handNode: .hour)
@@ -30,6 +31,7 @@ class InterfaceController: WKInterfaceController {
     }
     
     // MARK: - Private
+    static private let sceneSize: CGFloat = 100
     private var presentedTimestamp: Int?
 }
 
@@ -44,6 +46,7 @@ extension InterfaceController {
 extension InterfaceController {
     private func setupScene() {
         self.sceneInteface.presentScene(self.scene)
+        self.scene.backgroundColor = .black
         self.scene.anchorPoint = CGPoint(x: 0.5, y: 0.5)
         self.scene.updateHandler = { [weak self] in
             self?.updateTimeIfNeeded()
@@ -92,23 +95,25 @@ extension InterfaceController {
         case second
         
         var length: CGFloat {
+            let secondHandLength = InterfaceController.sceneSize / 2
             switch self {
             case .hour:
-                return 100
+                return secondHandLength * 0.6
             case .minute:
-                return 130
+                return secondHandLength * 0.8
             case .second:
-                return 150
+                return secondHandLength
             }
         }
         var width: CGFloat {
+            let secondHandWidth = InterfaceController.sceneSize / 100
             switch self {
             case .hour:
-                return 8
+                return secondHandWidth * 3
             case .minute:
-                return 5
+                return secondHandWidth * 2
             case .second:
-                return 1
+                return secondHandWidth
             }
         }
     }
