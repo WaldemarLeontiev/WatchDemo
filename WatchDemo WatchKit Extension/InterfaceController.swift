@@ -43,8 +43,9 @@ class InterfaceController: WKInterfaceController {
     // MARK: Settings
     static private let sceneSize: CGFloat = 100
     private let isHideInterfaceEnabled = true
+    private let updateRate: TimeInterval = 0.1
     // MARK: Vars
-    private var presentedTimestamp: Int?
+    private var presentedTimestamp: TimeInterval?
     private var isActivated: Bool = false {
         didSet {
             if self.isActivated == false {
@@ -89,8 +90,8 @@ extension InterfaceController {
     }
     private func updateTimeIfNeeded() {
         let date = Date()
-        let timestamp = Int(date.timeIntervalSince1970)
-        if timestamp != self.presentedTimestamp {
+        let timestamp = date.timeIntervalSince1970
+        if timestamp >= (self.presentedTimestamp ?? 0) + self.updateRate {
             self.presentedTimestamp = timestamp
             self.updateTime(with: date)
             if self.isActivated && self.isInterfaceHidden {
